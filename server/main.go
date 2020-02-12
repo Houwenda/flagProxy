@@ -60,7 +60,7 @@ func servePortList(resp http.ResponseWriter, req *http.Request) {
 		// TODO: get ports data
 		var result PortList
 		result.Msg = "success"
-		result.Ports = []int{1001, 1002, 1003, 1004}
+		result.Ports = []int{10001, 10002, 10003, 10004}
 		if err := json.NewEncoder(resp).Encode(&result); err != nil {
 			fmt.Println(err)
 		}

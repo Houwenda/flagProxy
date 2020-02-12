@@ -2,10 +2,13 @@ package main
 
 import (
 	"flagProxy/client/config"
+	"flagProxy/client/proxy"
 	"flagProxy/client/swaper"
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -50,4 +53,14 @@ func main() {
 	log.Println("fetching port list from server")
 	PortList = swaper.FetchPortList(Conf.ServerConf.Url, Conf.ServerConf.ChallengeId, Conf.ServerConf.Key)
 	log.Println("portList: ", PortList)
+
+	for _, port := range PortList {
+		go proxy.Proxy(port, Conf.ChallengeConf.Address, Conf.ChallengeConf.FlagRegex)
+	}
+
+	// shutdown gracefully
+	sig := make(chan os.Signal, 1)
+	//done := make(chan bool, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSTOP)
+	<-sig
 }

@@ -1,5 +1,7 @@
 challenge:
-  address: "www.baidu.com:80"
+  address: "192.168.0.108:8000"
+  #address: "www.baidu.com:80"
+  #address: "122.51.50.72:9999"
   flag_regex: "flag{.+}"
 server:
   url: "http://localhost:8080"
