@@ -1,0 +1,9 @@
+challenge:
+  address: "www.baidu.com:80"
+  flag_regex: "flag{.+}"
+server:
+  url: "http://localhost:8080"
+  challenge_id : "abcdefghijk"
+  key: "testkeyforchallenge0"
+log:
+  path: "/home/houwd/Desktop/flagProxy.log"
