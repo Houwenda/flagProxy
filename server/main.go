@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flagProxy/client/swaper"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
@@ -10,14 +11,26 @@ import (
 	"time"
 )
 
+var (
+	ChallengeId string
+	Key         string
+)
+
 type PortList struct {
 	Msg   string `json:"msg"`
 	Ports []int  `json:"ports"`
 }
 
+func init() {
+	// TODO: connect to data source & get auth data
+	ChallengeId = "abcdefghijk"
+	Key = "testkeyforchallenge0"
+}
+
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/ports/{challengeId}/{key}", servePortList).Methods("GET")
+	router.HandleFunc("/flagByPort/{challengeId}/{key}/{port}", serveFlagByPort).Methods("GET")
 	router.HandleFunc("/", connectionTest)
 
 	srv := &http.Server{
@@ -37,23 +50,19 @@ func connectionTest(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func servePortList(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
+func servePortList(writer http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
 	challengeId := params["challengeId"]
 	key := params["key"]
 
-	// TODO: connect to source & get auth data
-	cId := "abcdefghijk"
-	k := "testkeyforchallenge0"
-
-	resp.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Content-Type", "application/json")
 
 	// authenticate
-	if strings.Compare(challengeId, cId) != 0 || strings.Compare(key, k) != 0 { // fails
+	if strings.Compare(challengeId, ChallengeId) != 0 || strings.Compare(key, Key) != 0 { // fails
 		var result PortList
 		result.Msg = "auth error"
 		result.Ports = []int{}
-		if err := json.NewEncoder(resp).Encode(&result); err != nil {
+		if err := json.NewEncoder(writer).Encode(&result); err != nil {
 			fmt.Println(err)
 		}
 	} else { // succeeds
@@ -61,7 +70,37 @@ func servePortList(resp http.ResponseWriter, req *http.Request) {
 		var result PortList
 		result.Msg = "success"
 		result.Ports = []int{10001, 10002, 10003, 10004}
-		if err := json.NewEncoder(resp).Encode(&result); err != nil {
+		if err := json.NewEncoder(writer).Encode(&result); err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
+func serveFlagByPort(writer http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
+	challengeId := params["challengeId"]
+	key := params["key"]
+	port := params["port"]
+
+	writer.Header().Set("Content-Type", "application/json")
+
+	// authenticate
+	if strings.Compare(challengeId, ChallengeId) != 0 || strings.Compare(key, Key) != 0 { // fails
+		var flag swaper.FlagByPort
+		flag.Msg = "auth error"
+		flag.Flag = ""
+		if err := json.NewEncoder(writer).Encode(&flag); err != nil {
+			fmt.Println(err)
+		}
+	} else { // succeeds
+
+		// TODO: get real flag from data source
+		fmt.Println("query by port :", port)
+
+		var flag swaper.FlagByPort
+		flag.Msg = "success"
+		flag.Flag = "flag{test_flag_for_flag_proxy}"
+		if err := json.NewEncoder(writer).Encode(&flag); err != nil {
 			fmt.Println(err)
 		}
 	}

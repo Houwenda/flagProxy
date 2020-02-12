@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"encoding/hex"
+	"flagProxy/client/swaper"
 	"fmt"
 	"log"
 	"net"
@@ -60,17 +61,15 @@ func front2back(userConn net.Conn, challengeConn net.Conn, challengeHost string)
 		buf := make([]byte, 1024)
 		n, err := userConn.Read(buf)
 		if err != nil {
-			fmt.Println(err.Error())
 			break
 		}
 		payload := changeHost(string(buf[:n]), challengeHost)
-		fmt.Println("payload coming in: \n", hex.Dump(buf[:n]))
+		log.Println("payload coming in: \n", hex.Dump(buf[:n]))
 		_, err = challengeConn.Write([]byte(payload))
 		if err != nil {
 			log.Println("challengeConn write error", err.Error())
 		}
 	}
-	//time.Sleep(time.Second * 5)
 	if err := userConn.Close(); err != nil {
 		log.Println("userConn close error", err.Error())
 	}
@@ -78,55 +77,38 @@ func front2back(userConn net.Conn, challengeConn net.Conn, challengeHost string)
 }
 
 func back2front(challengeConn net.Conn, userConn net.Conn, flagRegex string) {
-	defer func() {
-		if err := userConn.Close(); err != nil {
-			log.Println("userConn close err", err.Error())
-		}
-	}()
-
-	buf1 := make([]byte, 256)
-	buf2 := make([]byte, 256)
-	var n1 int
-	var n2 int
-
+	bufCapacity := 512
+	buf1 := make([]byte, bufCapacity)
 	n1, err := challengeConn.Read(buf1)
 	if err != nil {
-		return
+		log.Println("challengeConn read error:", err)
 	}
-
-	log.Println("buf1:\n", hex.Dump(buf1[:n1]))
-
+	count := 0
 	for {
-		n2, err = challengeConn.Read(buf2)
+		buf2 := make([]byte, bufCapacity)
+		n2, err := challengeConn.Read(buf2)
 		if err != nil {
-			if _, err := userConn.Write(buf1); err != nil {
-				log.Println("userConn write error:", err.Error())
+			if count != 0 { // more than one slice
+				_, err = userConn.Write(buf1[:n1])
+				if err != nil {
+					log.Println("userConn write error:", err)
+				}
 			}
-			return
+			break
 		}
-		combinedResponse := []byte(string(buf1[:n1]) + string(buf2[:n2]))
-		matched, err := regexp.Match(flagRegex, combinedResponse)
+		bufCapacity = swaper.SwapFlag(&buf1, &buf2, flagRegex, userConn)
+		_, err = userConn.Write(buf1[:n1])
 		if err != nil {
-			log.Println("response regex error:", err.Error())
+			log.Println("userConn write error:", err)
 		}
-		if matched { // have flag
-			panic("flag found")
-		} else { // no flag found
-			log.Println("response coming out:\n", hex.Dump(buf1[:n1]))
-			fmt.Println("n1:", n1)
-			fmt.Println("n2:", n2)
-			//userConn.Write([]byte("\n------------------padding--------------------- \n"))
-			if _, err = userConn.Write(buf1[:n1]); err != nil {
-				log.Println("userConn write error:", err.Error())
-			}
-
-			//log.Println("buf1:\n", hex.Dump(buf1[:n1]))
-			//log.Println("buf2:\n", hex.Dump(buf2[:n2]))
-
-			buf1 = buf2
-			n1 = n2
-		}
-
+		buf1 = make([]byte, bufCapacity)
+		count += 1
+		buf1 = buf2
+		n1 = n2
+	}
+	err = challengeConn.Close()
+	if err != nil {
+		log.Println("challengeConn close error", err)
 	}
 }
 
