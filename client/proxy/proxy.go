@@ -96,12 +96,11 @@ func back2front(challengeConn net.Conn, userConn net.Conn, flagRegex string) {
 			}
 			break
 		}
-		bufCapacity = swaper.SwapFlag(&buf1, &buf2, flagRegex, userConn)
+		swaper.SwapFlag(&buf1, &n1, &buf2, &n2, flagRegex, userConn)
 		_, err = userConn.Write(buf1[:n1])
 		if err != nil {
 			log.Println("userConn write error:", err)
 		}
-		buf1 = make([]byte, bufCapacity)
 		count += 1
 		buf1 = buf2
 		n1 = n2
