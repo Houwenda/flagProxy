@@ -1,6 +1,6 @@
 # flagProxy
 
-A tool to detect cheating in CTF competitions based on TCP proxy. (Just a proof of concept)
+A tool to detect cheating in CTF competitions based on TCP proxy. (Just a proof of concept.)
 
 # concept
 
@@ -123,6 +123,6 @@ Note: Content-Type of the response should be "application/json".
 - Third, configure the client by editing the config file. 
 - Fourth, run the compiled client after flagProxy server is brought up by executing `./compiledClient /path/to/config/file`
 
-# warn
+# warning
 
 This tool is designed to be compatible with both web and binary challenges. But as a proof of concept, it has not been fully tested in security and functions, thus should not be used in production environment.
