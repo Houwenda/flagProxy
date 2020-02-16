@@ -9,7 +9,7 @@ import (
 	"regexp"
 )
 
-func Proxy(port int, challengeAddress string, flagRegex string) {
+func Proxy(port int, challengeAddress string, flagRegex string, threads int) {
 	defer func() {
 		if a := recover(); a != nil {
 			log.Println("listening on", port, " failed")
@@ -25,13 +25,18 @@ func Proxy(port int, challengeAddress string, flagRegex string) {
 	fmt.Println("start listening on", port)
 	log.Println("start listening on", port)
 
-	for {
-		userConn, err := listener.AcceptTCP()
-		if err != nil {
-			log.Println("acceptTcp error :", err.Error())
-			continue
-		}
-		go handleConn(userConn, challengeAddress, flagRegex)
+	fmt.Println(threads)
+	for i := 0; i < threads; i++ {
+		go func() {
+			for {
+				userConn, err := listener.AcceptTCP()
+				if err != nil {
+					log.Println("acceptTcp error :", err.Error())
+					continue
+				}
+				go handleConn(userConn, challengeAddress, flagRegex)
+			}
+		}()
 	}
 }
 

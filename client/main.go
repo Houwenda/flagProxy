@@ -55,7 +55,7 @@ func main() {
 	log.Println("portList: ", PortList)
 
 	for _, port := range PortList {
-		go proxy.Proxy(port, Conf.ChallengeConf.Address, Conf.ChallengeConf.FlagRegex)
+		go proxy.Proxy(port, Conf.ChallengeConf.Address, Conf.ChallengeConf.FlagRegex, Conf.ChallengeConf.Threads)
 	}
 
 	// shutdown gracefully

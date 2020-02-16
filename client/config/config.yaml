@@ -4,6 +4,7 @@ challenge:
   #address: "122.51.50.72:9999"
   flag_regex: "flag{.+}"
   #flag_regex: "flagProxy"
+  threads: 10
 server:
   url: "http://localhost:8080"
   challenge_id : "abcdefghijk"

@@ -20,6 +20,7 @@ type Config struct {
 type Challenge struct {
 	Address   string `yaml:"address"`
 	FlagRegex string `yaml:"flag_regex"`
+	Threads   int    `yaml:"threads"`
 }
 
 type Server struct {
