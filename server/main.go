@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"flagProxy/client/swaper"
 	"fmt"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"strings"
@@ -16,6 +18,14 @@ var (
 	Key         string
 )
 
+const (
+	host     = "localhost"
+	dbPort   = 5432
+	user     = "Tp0tOj"
+	password = "Tp0tOj-dev"
+	dbName   = "Tp0tOj"
+)
+
 type PortList struct {
 	Msg   string `json:"msg"`
 	Ports []int  `json:"ports"`
@@ -23,6 +33,25 @@ type PortList struct {
 
 func init() {
 	// TODO: connect to data source & get auth data
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, dbPort, user, password, dbName)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("server connected")
+
 	ChallengeId = "abcdefghijk"
 	Key = "testkeyforchallenge0"
 }

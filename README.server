@@ -1,0 +1,8 @@
+# flagProxy server
+
+This is an example of flagProxy server implementation.
+
+This server connects to a postgresql database which is used by [Tp0tOj](https://github.com/Tp0t-Team/Tp0tOJ).
+
+The entity structure can be found [here](https://github.com/Tp0t-Team/Tp0tOJ/wiki/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1)
+

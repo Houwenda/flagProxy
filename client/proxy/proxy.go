@@ -25,7 +25,6 @@ func Proxy(port int, challengeAddress string, flagRegex string, threads int) {
 	fmt.Println("start listening on", port)
 	log.Println("start listening on", port)
 
-	fmt.Println(threads)
 	for i := 0; i < threads; i++ {
 		go func() {
 			for {
