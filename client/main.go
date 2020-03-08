@@ -21,7 +21,7 @@ func init() {
 	var configPath string
 	if len(os.Args) != 2 {
 		fmt.Println("no config file provided")
-		configPath = "/home/houwd/go/src/flagProxy/client/config/config.yaml"
+		configPath = "/etc/flagProxy/config.yaml"
 	} else {
 		configPath = os.Args[1]
 	}

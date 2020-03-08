@@ -63,7 +63,7 @@ func (c *Config) Validate() error {
 
 	// server
 	// connection check
-	resp, err := http.Get(c.ServerConf.Url)
+	resp, err := http.Get(c.ServerConf.Url + "/test")
 	if err != nil {
 		return err
 	}
