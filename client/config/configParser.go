@@ -18,9 +18,11 @@ type Config struct {
 }
 
 type Challenge struct {
-	Address   string `yaml:"address"`
-	FlagRegex string `yaml:"flag_regex"`
-	Threads   int    `yaml:"threads"`
+	Address       string   `yaml:"address"`
+	FlagRegex     string   `yaml:"flag_regex"`
+	Threads       int      `yaml:"threads"`
+	DecodeScripts []string `yaml:"decode_scripts,flow"`
+	EncodeScripts []string `yaml:"encode_scripts,flow"`
 }
 
 type Server struct {
@@ -69,7 +71,7 @@ func (c *Config) Validate() error {
 	}
 	data := make([]byte, 1024)
 	if _, _ = resp.Body.Read(data); string(data[:9]) != "flagProxy" {
-		fmt.Println("server returns :", []byte(string(data[:9])))
+		fmt.Println("server returns :", string(data[:9]))
 		return errors.New("invalid server url")
 	}
 	return nil

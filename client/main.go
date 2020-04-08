@@ -55,8 +55,11 @@ func main() {
 	log.Println("portList: ", PortList)
 
 	for _, port := range PortList {
-		go proxy.Proxy(port, Conf.ChallengeConf.Address, Conf.ChallengeConf.FlagRegex, Conf.ChallengeConf.Threads)
+		go proxy.Proxy(port, Conf.ChallengeConf.Address, Conf.ChallengeConf.FlagRegex, Conf.ChallengeConf.Threads,
+			Conf.ChallengeConf.DecodeScripts, Conf.ChallengeConf.EncodeScripts)
 	}
+
+	fmt.Println("forwarding traffic to", Conf.ChallengeConf.Address)
 
 	// shutdown gracefully
 	sig := make(chan os.Signal, 1)

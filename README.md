@@ -12,7 +12,7 @@ Then the client replaces the initial flag with real flag.
 # assumptions
 
 - All payloads and flags should be transmitted through TCP connections. 
-- Flags should not be placed in more than TWO segments. (Test is needed if encoding is used in traffic.)
+- Flags should not be placed in more than TWO segments. (Test is needed if encoding is used in traffic. FlagProxy now supports lua scripts.)
 - Flags can be matched using regular expressions. (In other words, encrypted traffic is currently not supported by flagProxy.)
 
 # client config
@@ -24,6 +24,8 @@ challenge:
   address: "192.168.0.108:8000"  # address of the challenge
   flag_regex: "flag{.+}"  #  the regular expression to detect initial flag
   threads: 10  # controls the throughput of the challenge
+  decode_scripts: ["/etc/flagProxy/decode.lua"]  # lua files that decode the response before regular expression detection
+  encode_scripts: ["/etc/flagProxy/encode.lua"]  # lua files that encode the response after detecting flag
 server:
   url: "http://localhost:8080"  # server api address
   challenge_id : "testchallengeid"  # a random string for api server to recognize challenge
@@ -120,8 +122,16 @@ Note: Content-Type of the response should be "application/json".
 
 - First, Implement the server APIs.
 - Second, compile the flagProxy client.
-- Third, configure the client by editing the config file. 
+- Third, configure the client by editing the config file.
 - Fourth, run the compiled client after flagProxy server is brought up by executing `./compiledClient /path/to/config/file`
+
+Use testing configuration files:
+```shell script
+cd flagProxy/
+cp config/config.yaml /etc/flagProxy/conig.yaml
+cp config/decode.lua /etc/flagProxy/decode.lua
+cp config/encode.lua /etc/flagProxy/encode.lua
+```
 
 # warning
 

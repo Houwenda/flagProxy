@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"flagProxy/client/swaper"
 	"fmt"
@@ -33,24 +32,24 @@ type PortList struct {
 
 func init() {
 	// TODO: connect to data source & get auth data
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, dbPort, user, password, dbName)
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			panic(err)
-		}
-	}()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("server connected")
+	//psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	//	"password=%s dbname=%s sslmode=disable",
+	//	host, dbPort, user, password, dbName)
+	//db, err := sql.Open("postgres", psqlInfo)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer func() {
+	//	if err := db.Close(); err != nil {
+	//		panic(err)
+	//	}
+	//}()
+	//
+	//err = db.Ping()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Println("server connected")
 
 	ChallengeId = "abcdefghijk"
 	Key = "testkeyforchallenge0"
@@ -60,7 +59,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/ports/{challengeId}/{key}", servePortList).Methods("GET")
 	router.HandleFunc("/flagByPort/{challengeId}/{key}/{port}", serveFlagByPort).Methods("GET")
-	router.HandleFunc("/", connectionTest)
+	router.HandleFunc("/test", connectionTest)
 
 	srv := &http.Server{
 		Handler: router,

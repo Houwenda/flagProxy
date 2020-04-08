@@ -5,6 +5,8 @@ challenge:
   flag_regex: "flag{.+}"
   #flag_regex: "flagProxy"
   threads: 10
+  decode_scripts: ["/etc/flagProxy/decode.lua"]
+  encode_scripts: ["/etc/flagProxy/encode.lua"]
 server:
   url: "http://localhost:8080"
   challenge_id : "abcdefghijk"

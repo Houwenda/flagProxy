@@ -9,7 +9,7 @@ import (
 	"regexp"
 )
 
-func Proxy(port int, challengeAddress string, flagRegex string, threads int) {
+func Proxy(port int, challengeAddress string, flagRegex string, threads int, decodeScripts []string, encodeScripts []string) {
 	defer func() {
 		if a := recover(); a != nil {
 			log.Println("listening on", port, " failed")
@@ -33,13 +33,13 @@ func Proxy(port int, challengeAddress string, flagRegex string, threads int) {
 					log.Println("acceptTcp error :", err.Error())
 					continue
 				}
-				go handleConn(userConn, challengeAddress, flagRegex)
+				go handleConn(userConn, challengeAddress, flagRegex, decodeScripts, encodeScripts)
 			}
 		}()
 	}
 }
 
-func handleConn(userConn net.Conn, cAddress string, flagRegex string) {
+func handleConn(userConn net.Conn, cAddress string, flagRegex string, decodeScripts []string, encodeScripts []string) {
 	defer func() {
 		if a := recover(); a != nil {
 			log.Println("recovered", a)
@@ -57,7 +57,7 @@ func handleConn(userConn net.Conn, cAddress string, flagRegex string) {
 	}
 
 	go front2back(userConn, challengeConn, cAddress)
-	back2front(challengeConn, userConn, flagRegex)
+	back2front(challengeConn, userConn, flagRegex, decodeScripts, encodeScripts)
 }
 
 func front2back(userConn net.Conn, challengeConn net.Conn, challengeHost string) {
@@ -80,7 +80,7 @@ func front2back(userConn net.Conn, challengeConn net.Conn, challengeHost string)
 
 }
 
-func back2front(challengeConn net.Conn, userConn net.Conn, flagRegex string) {
+func back2front(challengeConn net.Conn, userConn net.Conn, flagRegex string, decodeScripts []string, encodeScripts []string) {
 	bufCapacity := 512
 	buf1 := make([]byte, bufCapacity)
 	n1, err := challengeConn.Read(buf1)
@@ -100,7 +100,7 @@ func back2front(challengeConn net.Conn, userConn net.Conn, flagRegex string) {
 			}
 			break
 		}
-		swaper.SwapFlag(&buf1, &n1, &buf2, &n2, flagRegex, userConn)
+		swaper.SwapFlag(&buf1, &n1, &buf2, &n2, flagRegex, userConn, decodeScripts, encodeScripts)
 		_, err = userConn.Write(buf1[:n1])
 		if err != nil {
 			log.Println("userConn write error:", err)
